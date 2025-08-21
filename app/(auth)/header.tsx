@@ -14,7 +14,7 @@ import Link from "next/link";
 
 import Banner from "@/components/banner";
 import { Button } from "@/components/ui/button";
-import { links } from "@/config";
+import { links } from "@/config/links";
 import { cn } from "@/lib/utils";
 
 export const Header = () => {

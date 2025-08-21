@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 import Link from "next/link";
 
-import { links } from "@/config";
+import { links } from "@/config/links";
 
 type BannerProps = {
   hide: boolean;
