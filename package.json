@@ -10,6 +10,7 @@
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "db:studio": "npx drizzle-kit studio",
+    "db:gen": "npx drizzle-kit generate",
     "db:push": "npx drizzle-kit push",
     "db:migrate": "npx drizzle-kit migrate",
     "db:prod": "tsx ./scripts/prod.ts",
