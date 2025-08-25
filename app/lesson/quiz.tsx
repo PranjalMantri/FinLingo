@@ -9,10 +9,7 @@ import { useAudio, useWindowSize, useMount } from "react-use";
 import { toast } from "sonner";
 
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
-import { reduceHearts } from "@/actions/user-progress";
-import { MAX_HEARTS } from "@/constants";
-import { challengeOptions, challenges, userSubscription } from "@/db/schema";
-import { useHeartsModal } from "@/store/use-hearts-modal";
+import { challengeOptions, challenges } from "@/db/schema";
 import { usePracticeModal } from "@/store/use-practice-modal";
 
 import { Challenge } from "./challenge";
@@ -23,25 +20,17 @@ import { ResultCard } from "./result-card";
 
 type QuizProps = {
   initialPercentage: number;
-  initialHearts: number;
   initialLessonId: number;
   initialLessonChallenges: (typeof challenges.$inferSelect & {
     completed: boolean;
     challengeOptions: (typeof challengeOptions.$inferSelect)[];
   })[];
-  userSubscription:
-    | (typeof userSubscription.$inferSelect & {
-        isActive: boolean;
-      })
-    | null;
 };
 
 export const Quiz = ({
   initialPercentage,
-  initialHearts,
   initialLessonId,
   initialLessonChallenges,
-  userSubscription,
 }: QuizProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [correctAudio, _c, correctControls] = useAudio({ src: "/correct.wav" });
@@ -57,7 +46,6 @@ export const Quiz = ({
 
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const { open: openHeartsModal } = useHeartsModal();
   const { open: openPracticeModal } = usePracticeModal();
 
   useMount(() => {
@@ -65,7 +53,6 @@ export const Quiz = ({
   });
 
   const [lessonId] = useState(initialLessonId);
-  const [hearts, setHearts] = useState(initialHearts);
   const [percentage, setPercentage] = useState(() => {
     return initialPercentage === 100 ? 0 : initialPercentage;
   });
@@ -117,36 +104,10 @@ export const Quiz = ({
     if (correctOption.id === selectedOption) {
       startTransition(() => {
         upsertChallengeProgress(challenge.id)
-          .then((response) => {
-            if (response?.error === "hearts") {
-              openHeartsModal();
-              return;
-            }
-
+          .then(() => {
             void correctControls.play();
             setStatus("correct");
             setPercentage((prev) => prev + 100 / challenges.length);
-
-            // This is a practice
-            if (initialPercentage === 100) {
-              setHearts((prev) => Math.min(prev + 1, MAX_HEARTS));
-            }
-          })
-          .catch(() => toast.error("Something went wrong. Please try again."));
-      });
-    } else {
-      startTransition(() => {
-        reduceHearts(challenge.id)
-          .then((response) => {
-            if (response?.error === "hearts") {
-              openHeartsModal();
-              return;
-            }
-
-            void incorrectControls.play();
-            setStatus("wrong");
-
-            if (!response?.error) setHearts((prev) => Math.max(prev - 1, 0));
           })
           .catch(() => toast.error("Something went wrong. Please try again."));
       });
@@ -187,10 +148,6 @@ export const Quiz = ({
 
           <div className="flex w-full items-center gap-x-4">
             <ResultCard variant="points" value={challenges.length * 10} />
-            <ResultCard
-              variant="hearts"
-              value={userSubscription?.isActive ? Infinity : hearts}
-            />
           </div>
         </div>
 
@@ -212,11 +169,7 @@ export const Quiz = ({
     <>
       {incorrectAudio}
       {correctAudio}
-      <Header
-        hearts={hearts}
-        percentage={percentage}
-        hasActiveSubscription={!!userSubscription?.isActive}
-      />
+      <Header percentage={percentage} />
 
       <div className="flex-1">
         <div className="flex h-full items-center justify-center">

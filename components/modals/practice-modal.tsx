@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import Image from "next/image";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,17 +25,13 @@ export const PracticeModal = () => {
     <Dialog open={isOpen} onOpenChange={close}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <div className="mb-5 flex w-full items-center justify-center">
-            <Image src="/heart.svg" alt="Heart" height={100} width={100} />
-          </div>
-
           <DialogTitle className="text-center text-2xl font-bold">
             Practice lesson
           </DialogTitle>
 
           <DialogDescription className="text-center text-base">
-            Use practice lessons to regain hearts and points. You cannot loose
-            hearts or points in practice lessons.
+            Use practice lessons to gain points. You cannot loose points in
+            practice lessons.
           </DialogDescription>
         </DialogHeader>
 
